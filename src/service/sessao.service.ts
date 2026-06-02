@@ -56,11 +56,13 @@ export class SessaoService {
 
         }
         }
-        
-
-
 
         return this.sessaoRepository.criarSessao(sessao);
+    }
+
+
+    async pagamentoSessao() {
+        
     }
 
     listarAllSessoes() {
