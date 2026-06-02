@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Tiers {
+    COMUM 
+    IMERSIVO 
+    DELUX 
+    IMAX 
+    
+}
+
+enum StatusCadeira {
+    OCUPADA
+    LIVRE
+}
+
+model Salas {
+  idSalas  Int    @id @default(autoincrement())
+  numero   Int    @unique
+  tierSala Tiers
+  qtdeLimiteAssentos Int 
+
+  sessoes Sessao[]
+
+  assentos Assentos[]
+
+  @@map("salas")
+}
+
+model Assentos {
+  idAssentos    Int             @id @default(autoincrement())
+  identificacao String          @unique
+  statusCadeira StatusCadeira   @default(LIVRE)
+
+  idSala Int
+  sala   Salas           @relation(fields: [idSala], references: [idSalas])
+
+  @@map("assentos")
+
+
+}
+
+model Sessao {
+  idSessao   Int      @id @default(autoincrement())
+  dataSessao DateTime
+
+  idSala Int
+  sala   Salas @relation(fields: [idSala], references: [idSalas])  
+
+  idFilme Int
+  filme   Filme @relation(fields: [idFilme], references: [idFilme])
+
+  @@map("sessoes")
+}
+
+model Filme {
+  idFilme                 Int    @id @default(autoincrement())
+  nome                    String @unique
+  categoria               String
+  classificacaoIndicativa Int
+  minutosFilme            Int    @default(60)
+
+  sessoes Sessao[]
+
+  @@map("filmes")
+}
