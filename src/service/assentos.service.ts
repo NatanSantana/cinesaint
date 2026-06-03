@@ -27,7 +27,7 @@ export class AssentosService {
     }
 
     async assentosByIdSala(idSala: number) {
-        return await this.assentosRepository.assentosByIdSala(idSala);
+        return await this.assentosRepository.allAssentosByIdSala(idSala);
     }
 
 

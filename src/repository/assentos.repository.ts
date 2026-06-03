@@ -12,10 +12,20 @@ export class AssentosRepository {
         });
     }
 
-    assentosByIdSala(idSala: number) {
+    allAssentosByIdSala(idSala: number) {
         return this.prisma.assentos.findMany({
             where: {
                 idSala: idSala
+            }
+        });
+    }
+
+    buscarAssentosById(id: number[]) {
+        return this.prisma.assentos.findMany({
+            where: {
+                idAssentos: {
+                    in: id
+                }
             }
         });
     }

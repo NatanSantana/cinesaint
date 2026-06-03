@@ -5,13 +5,22 @@ import { SalasRepository } from "../repository/salas.repository";
 import { BadRequestException } from "@nestjs/common/exceptions";
 import { FilmeRepository } from "../repository/filme.repository";
 import { addDays, format, addMinutes, isAfter, isBefore, isEqual } from 'date-fns';
+import { PagamentoSessaoDto } from "../DTO/pagamento-sessao.dto";
+import { AssentosRepository } from "../repository/assentos.repository";
+import { PagamentoSessaoRepository } from "../repository/pagamento-sessao.repository";
+import { IngressosRepository } from "../repository/ingressos.repository";
+import { Tiers } from "../enum/tiers.enum";
 
 
 @Injectable()
 export class SessaoService {
     constructor(private sessaoRepository: SessaoRepository, 
         private salaRepository: SalasRepository,
-        private filmeRepository: FilmeRepository) { }
+        private filmeRepository: FilmeRepository,
+        private assentoRepository: AssentosRepository,
+        private pagamentoSessaoRepository: PagamentoSessaoRepository,
+        private ingressoRepository: IngressosRepository
+    ) { }
 
 
 
@@ -56,11 +65,62 @@ export class SessaoService {
 
         }
         }
-        
-
-
 
         return this.sessaoRepository.criarSessao(sessao);
+    }
+
+    // falta verificar se o ingresso é compatível com o tier da sala, 
+    // e se os assentos estão disponíveis para venda 
+    // e se o idfilme é compatível com a sessão selecionada
+    // se a sessão já começou
+    async pagamentoSessao(checkout: PagamentoSessaoDto) {
+        
+        const sessao = await this.sessaoRepository.buscarSessaoById(checkout.idSessao);
+
+        if (!sessao) {
+            throw new BadRequestException("Sessão não encontrada");
+        }
+        
+        const sala = await this.salaRepository.searchById(checkout.idSala);
+
+        if (!sala) {
+            throw new BadRequestException("Sala não encontrada");
+        }
+
+        const filme = await this.filmeRepository.searchById(checkout.idFilme);
+
+        if (!filme) {
+            throw new BadRequestException("Filme não encontrado");
+        }
+
+        
+        const ingresso = await this.ingressoRepository.buscarIngressoById(checkout.idIngresso);
+
+        if (!ingresso) {
+            throw new BadRequestException("Ingresso não encontrado");
+        }
+
+
+        if (!Object.values(Tiers).includes(ingresso.tiers)) {
+            throw new BadRequestException("O ingresso deve conter um tier válido");
+        }
+
+        const assentos = await this.assentoRepository.buscarAssentosById(checkout.idAssentos);
+
+
+        for (const s of assentos) {
+            
+            if (checkout.idAssentos.includes(s.idAssentos) === false) {
+                throw new BadRequestException(`Assento com id ${s.idAssentos} não encontrado`);
+            }
+
+            if (s.statusCadeira === "OCUPADA") {
+                throw new BadRequestException(`Assento com id ${s.idAssentos} já está ocupado`);
+            }
+
+            return this.pagamentoSessaoRepository.registrarPagamentoSessao(checkout, s.idAssentos);
+        }
+
     }
 
     listarAllSessoes() {

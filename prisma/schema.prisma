@@ -12,6 +12,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum StatusIngresso {
+    VALIDO
+    UTILIZADO
+}
+
 enum Tiers {
     COMUM 
     IMERSIVO 
@@ -35,6 +40,8 @@ model Salas {
 
   assentos Assentos[]
 
+  ingressosComprados IngressosComprados[]
+
   @@map("salas")
 }
 
@@ -46,8 +53,48 @@ model Assentos {
   idSala Int
   sala   Salas           @relation(fields: [idSala], references: [idSalas])
 
+
+  ingressosComprados IngressosComprados[]
+
   @@map("assentos")
 
+
+}
+
+model Ingressos {
+  idIngresso Int @id @default(autoincrement())
+  valor Int
+  tiers Tiers
+
+  ingressosComprados IngressosComprados[]
+
+  @@map("ingressos")
+}
+
+
+model IngressosComprados {
+  idIngressoComprado  Int @id @default(autoincrement())
+
+  idSala      Int
+  sala        Salas       @relation(fields: [idSala], references: [idSalas])
+
+  idFilme     Int
+  filme       Filme       @relation(fields: [idFilme], references: [idFilme])
+
+  idSessao    Int
+  sessoes     Sessao      @relation(fields: [idSessao], references: [idSessao])
+
+  idIngresso Int
+  ingressos  Ingressos    @relation(fields: [idIngresso], references: [idIngresso]) 
+
+  idAssento Int
+  assentos  Assentos      @relation(fields: [idAssento], references: [idAssentos])
+
+  status      StatusIngresso
+
+  cpf         String
+
+  @@map("ingressosComprados")
 
 }
 
@@ -61,6 +108,8 @@ model Sessao {
   idFilme Int
   filme   Filme @relation(fields: [idFilme], references: [idFilme])
 
+  ingressosComprados IngressosComprados[]
+
   @@map("sessoes")
 }
 
@@ -72,6 +121,8 @@ model Filme {
   minutosFilme            Int    @default(60)
 
   sessoes Sessao[]
+
+  ingressosComprados IngressosComprados[]
 
   @@map("filmes")
 }
