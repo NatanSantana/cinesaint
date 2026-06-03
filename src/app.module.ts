@@ -14,6 +14,9 @@ import { SessaoRepository } from './repository/sessao.repository';
 import { AssentosController } from './controller/assentos.controller';
 import { AssentosRepository } from './repository/assentos.repository';
 import { AssentosService } from './service/assentos.service';
+import { IngressosRepository } from './repository/ingressos.repository';
+import { IngressoService } from './service/ingresso.service';
+import { PagamentoSessaoRepository } from './repository/pagamento-sessao.repository';
 
 @Module({
   imports: [],
@@ -34,7 +37,10 @@ import { AssentosService } from './service/assentos.service';
     SessaoService,
     SessaoRepository,
     AssentosService,
-    AssentosRepository
+    AssentosRepository,
+    IngressosRepository,
+    IngressoService,
+    PagamentoSessaoRepository
   ],
 })
 export class AppModule {}

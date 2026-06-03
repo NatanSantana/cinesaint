@@ -15,6 +15,14 @@ export class SessaoRepository {
 
     }
 
+    buscarSessaoById(id: number) {
+        return this.prisma.sessao.findUnique({
+            where: {
+                idSessao: id
+            }
+        });
+    }
+
     listarAllSessoes() {
         return this.prisma.sessao.findMany();
     }

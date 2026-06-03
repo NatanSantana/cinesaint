@@ -53,6 +53,9 @@ model Assentos {
   idSala Int
   sala   Salas           @relation(fields: [idSala], references: [idSalas])
 
+
+  ingressosComprados IngressosComprados[]
+
   @@map("assentos")
 
 
@@ -70,7 +73,7 @@ model Ingressos {
 
 
 model IngressosComprados {
-  idIngressoComprado  Int  @id @default(autoincrement())
+  idIngressoComprado  Int @id @default(autoincrement())
 
   idSala      Int
   sala        Salas       @relation(fields: [idSala], references: [idSalas])
@@ -84,14 +87,14 @@ model IngressosComprados {
   idIngresso Int
   ingressos  Ingressos    @relation(fields: [idIngresso], references: [idIngresso]) 
 
+  idAssento Int
+  assentos  Assentos      @relation(fields: [idAssento], references: [idAssentos])
 
   status      StatusIngresso
 
   cpf         String
 
   @@map("ingressosComprados")
-
-
 
 }
 
