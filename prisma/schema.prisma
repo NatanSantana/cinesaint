@@ -36,7 +36,7 @@ enum Tiers {
 }
 
 enum StatusCadeira {
-    OCUPADA
+    MANUTENCAO
     LIVRE
 }
 
@@ -66,9 +66,21 @@ model Assentos {
 
   ingressosComprados IngressosComprados[]
 
+  assentosOcupados   AssentosOcupados[]
+
   @@map("assentos")
+}
 
+model AssentosOcupados {
+  idAssentoOcupado  Int         @id @default(autoincrement())
 
+  idAssento         Int
+  assentos          Assentos    @relation(fields: [idAssento], references: [idAssentos])
+
+  idSessao          Int
+  sessoes           Sessao      @relation(fields: [idSessao], references: [idSessao])
+
+  @@map("assentosOcupados")
 }
 
 model Ingressos {
@@ -121,6 +133,8 @@ model Sessao {
   statusSessao StatusSessao   @default(ATIVO)
 
   ingressosComprados IngressosComprados[]
+
+  assentosOcupados AssentosOcupados[]
 
   @@map("sessoes")
 }

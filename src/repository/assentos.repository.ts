@@ -43,13 +43,6 @@ export class AssentosRepository {
         });
     }
 
-    async atualizarAssentoParaOcupado(idAssento: number) {
-    return await this.prisma.assentos.update({
-        where: { idAssentos: idAssento },
-        data: { statusCadeira: "OCUPADA" }
-            }).catch(err => console.error("Erro ao atualizar assento:", err));
-        }
-
     qtdeAssentosByIdSala(idSala: number): Promise<number> {
         return this.prisma.assentos.count({
             where: {

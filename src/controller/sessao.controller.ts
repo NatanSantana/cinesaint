@@ -8,17 +8,20 @@ import { RolesGuard } from "../security/role.guard";
 
 
 @Controller('/sessao')
-@UseGuards(JwtAuthGuard, RolesGuard)
 export class SessaoController {
     constructor(private sessaoService: SessaoService) { }
 
-    @Roles('ADM')
+    
     @Post()
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADM')
     criarSessao(@Body() sessao: CreateSessaoDto) {
         return this.sessaoService.criarSessao(sessao);
     }
 
     @Post('/pagar')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('USER', 'ADM')
     pagarSessao(@Body() checkout: PagamentoSessaoDto) {
         return this.sessaoService.pagamentoSessao(checkout);
     }
@@ -31,6 +34,11 @@ export class SessaoController {
     @Get(':idFilme')
     listarSessoesByIdFilme(@Param('idFilme') idFilme: string) {
         return this.sessaoService.listarSessoesByIdFilme(+idFilme);
+    }
+
+    @Post('/encerrar-sessoes')
+    async encerrarSessoes(@Body() idSalas: number[]) {
+        return await this.sessaoService.marcarSessoesFinalizadas(idSalas);
     }
 
 }

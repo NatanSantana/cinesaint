@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { SessaoRepository } from "../repository/sessao.repository";
 import { CreateSessaoDto } from "../DTO/create-sessao.dto";
 import { SalasRepository } from "../repository/salas.repository";
-import { BadRequestException } from "@nestjs/common/exceptions";
+import { BadRequestException, ConflictException, NotFoundException } from "@nestjs/common/exceptions";
 import { FilmeRepository } from "../repository/filme.repository";
 import { addDays, format, addMinutes, isAfter, isBefore, isEqual } from 'date-fns';
 import { PagamentoSessaoDto } from "../DTO/pagamento-sessao.dto";
@@ -10,6 +10,9 @@ import { AssentosRepository } from "../repository/assentos.repository";
 import { PagamentoSessaoRepository } from "../repository/pagamento-sessao.repository";
 import { IngressosRepository } from "../repository/ingressos.repository";
 import { Tiers } from "../enum/tiers.enum";
+import { UsersRepository } from "../repository/users.repository";
+import { AssentosOcupadosRepository } from "../repository/assentos-ocupados.repository";
+import { createAssentosOcupados } from "../DTO/create-assentos-ocupados.dto";
 
 
 @Injectable()
@@ -19,7 +22,9 @@ export class SessaoService {
         private filmeRepository: FilmeRepository,
         private assentoRepository: AssentosRepository,
         private pagamentoSessaoRepository: PagamentoSessaoRepository,
-        private ingressoRepository: IngressosRepository
+        private ingressoRepository: IngressosRepository,
+        private userRepository: UsersRepository,
+        private assentosOcupadosRepository: AssentosOcupadosRepository
     ) { }
 
 
@@ -77,15 +82,17 @@ export class SessaoService {
     if (isBefore(sessao.dataSessao, new Date()))
         throw new BadRequestException("Sessão já iniciada");
 
-    const [sala, filme, ingresso] = await Promise.all([
+    const [sala, filme, ingresso, user] = await Promise.all([
         this.salaRepository.searchById(checkout.idSala),
         this.filmeRepository.searchById(checkout.idFilme),
         this.ingressoRepository.buscarIngressoById(checkout.idIngresso),
+        this.userRepository.findByCpf(checkout.cpfCliente)
     ]);
 
-    if (!sala)    throw new BadRequestException("Sala não encontrada");
-    if (!filme)   throw new BadRequestException("Filme não encontrado");
-    if (!ingresso) throw new BadRequestException("Ingresso não encontrado");
+    if (!sala)      throw new NotFoundException("Sala não encontrada");
+    if (!filme)     throw new NotFoundException("Filme não encontrado");
+    if (!ingresso)  throw new NotFoundException("Ingresso não encontrado");
+    if (!user)      throw new NotFoundException("Usuário não encontrado, confira o CPF")
 
     if (sessao.idFilme !== checkout.idFilme)
         throw new BadRequestException("Filme não corresponde à sessão");
@@ -96,24 +103,34 @@ export class SessaoService {
     if (ingresso.tiers !== sala.tierSala)
         throw new BadRequestException("Ingresso incompatível com o tier da sala");
 
+    // busca o objeto inteiro do assento
     const assentos = await this.assentoRepository.buscarAssentosLivresById(checkout.idAssentos);
 
     if (assentos.length !== checkout.idAssentos.length)
         throw new BadRequestException("Um ou mais assentos não estão disponíveis");
+    ;
+
+    
 
     await Promise.all(
-    assentos.map(s => this.assentoRepository.atualizarAssentoParaOcupado(s.idAssentos))
-    );
-
-    return Promise.all(
         assentos.map(s => this.pagamentoSessaoRepository.registrarPagamentoSessao(checkout, s.idAssentos))
     );
+
+    for (let i of assentos) {
+        const isAssentoOcupado = await this.assentosOcupadosRepository.isAssentoOcupado(i.idAssentos, checkout.idSessao)
+        if (isAssentoOcupado === true) {
+            throw new ConflictException("Todos os assentos selecionados devem estar livres")
+        }
+
+
+        const assentos = new createAssentosOcupados(i.idAssentos, checkout.idSessao)
+        await this.assentosOcupadosRepository.registrarAssento(assentos)
+    }
+
+    return "pagamento concluído"
     }
 
     marcarSessoesFinalizadas(idSala: number[]) {
-        
-
-
         return this.sessaoRepository.inativarSessoes(idSala);
     }
 

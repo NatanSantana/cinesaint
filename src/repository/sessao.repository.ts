@@ -11,7 +11,11 @@ export class SessaoRepository {
 
     inativarSessoes(idSessoes: number[]) {
     return this.prisma.sessao.updateMany({
-        where: { idSessao: { in: idSessoes } },
+        where: {
+            AND: [
+                {idSessao: { in: idSessoes } },
+                {dataSessao: { lt: new Date()}}
+            ] },
         data: { statusSessao: "INATIVO" }
     });
 }
