@@ -1,11 +1,21 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateSessaoDto } from "../DTO/create-sessao.dto";
+import { StatusSessao } from "../enum/status-sessao.enum";
 
 @Injectable()
 export class SessaoRepository {
 
     constructor(private prisma: PrismaService) { }
+
+
+    inativarSessoes(idSessoes: number[]) {
+    return this.prisma.sessao.updateMany({
+        where: { idSessao: { in: idSessoes } },
+        data: { statusSessao: "INATIVO" }
+    });
+}
+
 
 
     criarSessao(sessao: CreateSessaoDto) {

@@ -69,58 +69,52 @@ export class SessaoService {
         return this.sessaoRepository.criarSessao(sessao);
     }
 
-    // falta verificar se o ingresso é compatível com o tier da sala, 
-    // e se os assentos estão disponíveis para venda 
-    // e se o idfilme é compatível com a sessão selecionada
-    // se a sessão já começou
+    
     async pagamentoSessao(checkout: PagamentoSessaoDto) {
+    const sessao = await this.sessaoRepository.buscarSessaoById(checkout.idSessao);
+    if (!sessao) throw new BadRequestException("Sessão não encontrada");
+
+    if (isBefore(sessao.dataSessao, new Date()))
+        throw new BadRequestException("Sessão já iniciada");
+
+    const [sala, filme, ingresso] = await Promise.all([
+        this.salaRepository.searchById(checkout.idSala),
+        this.filmeRepository.searchById(checkout.idFilme),
+        this.ingressoRepository.buscarIngressoById(checkout.idIngresso),
+    ]);
+
+    if (!sala)    throw new BadRequestException("Sala não encontrada");
+    if (!filme)   throw new BadRequestException("Filme não encontrado");
+    if (!ingresso) throw new BadRequestException("Ingresso não encontrado");
+
+    if (sessao.idFilme !== checkout.idFilme)
+        throw new BadRequestException("Filme não corresponde à sessão");
+
+    if (!Object.values(Tiers).includes(ingresso.tiers))
+        throw new BadRequestException("Tier do ingresso inválido");
+
+    if (ingresso.tiers !== sala.tierSala)
+        throw new BadRequestException("Ingresso incompatível com o tier da sala");
+
+    const assentos = await this.assentoRepository.buscarAssentosLivresById(checkout.idAssentos);
+
+    if (assentos.length !== checkout.idAssentos.length)
+        throw new BadRequestException("Um ou mais assentos não estão disponíveis");
+
+    await Promise.all(
+    assentos.map(s => this.assentoRepository.atualizarAssentoParaOcupado(s.idAssentos))
+    );
+
+    return Promise.all(
+        assentos.map(s => this.pagamentoSessaoRepository.registrarPagamentoSessao(checkout, s.idAssentos))
+    );
+    }
+
+    marcarSessoesFinalizadas(idSala: number[]) {
         
-        const sessao = await this.sessaoRepository.buscarSessaoById(checkout.idSessao);
-
-        if (!sessao) {
-            throw new BadRequestException("Sessão não encontrada");
-        }
-        
-        const sala = await this.salaRepository.searchById(checkout.idSala);
-
-        if (!sala) {
-            throw new BadRequestException("Sala não encontrada");
-        }
-
-        const filme = await this.filmeRepository.searchById(checkout.idFilme);
-
-        if (!filme) {
-            throw new BadRequestException("Filme não encontrado");
-        }
-
-        
-        const ingresso = await this.ingressoRepository.buscarIngressoById(checkout.idIngresso);
-
-        if (!ingresso) {
-            throw new BadRequestException("Ingresso não encontrado");
-        }
 
 
-        if (!Object.values(Tiers).includes(ingresso.tiers)) {
-            throw new BadRequestException("O ingresso deve conter um tier válido");
-        }
-
-        const assentos = await this.assentoRepository.buscarAssentosById(checkout.idAssentos);
-
-
-        for (const s of assentos) {
-            
-            if (checkout.idAssentos.includes(s.idAssentos) === false) {
-                throw new BadRequestException(`Assento com id ${s.idAssentos} não encontrado`);
-            }
-
-            if (s.statusCadeira === "OCUPADA") {
-                throw new BadRequestException(`Assento com id ${s.idAssentos} já está ocupado`);
-            }
-
-            return this.pagamentoSessaoRepository.registrarPagamentoSessao(checkout, s.idAssentos);
-        }
-
+        return this.sessaoRepository.inativarSessoes(idSala);
     }
 
     listarAllSessoes() {

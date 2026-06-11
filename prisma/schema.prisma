@@ -17,6 +17,16 @@ enum StatusIngresso {
     UTILIZADO
 }
 
+enum Roles {
+    ADM
+    USER
+}
+
+enum StatusSessao {
+  ATIVO
+  INATIVO
+}
+
 enum Tiers {
     COMUM 
     IMERSIVO 
@@ -99,14 +109,16 @@ model IngressosComprados {
 }
 
 model Sessao {
-  idSessao   Int      @id @default(autoincrement())
-  dataSessao DateTime
+  idSessao    Int             @id @default(autoincrement())
+  dataSessao  DateTime
 
-  idSala Int
-  sala   Salas @relation(fields: [idSala], references: [idSalas])  
+  idSala      Int
+  sala        Salas           @relation(fields: [idSala], references: [idSalas])  
 
-  idFilme Int
-  filme   Filme @relation(fields: [idFilme], references: [idFilme])
+  idFilme      Int
+  filme        Filme          @relation(fields: [idFilme], references: [idFilme])
+
+  statusSessao StatusSessao   @default(ATIVO)
 
   ingressosComprados IngressosComprados[]
 
@@ -125,4 +137,18 @@ model Filme {
   ingressosComprados IngressosComprados[]
 
   @@map("filmes")
+
+
+  
 }
+
+
+model Users {
+    idUser          Int     @id @default(autoincrement())
+    nome            String
+    email           String  @unique
+    senha           String
+    cpf             String  @unique
+    dataNascimento  DateTime
+    role            Roles   @default(USER)
+  }

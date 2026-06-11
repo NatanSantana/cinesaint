@@ -17,14 +17,18 @@ import { AssentosService } from './service/assentos.service';
 import { IngressosRepository } from './repository/ingressos.repository';
 import { IngressoService } from './service/ingresso.service';
 import { PagamentoSessaoRepository } from './repository/pagamento-sessao.repository';
+import { UsersModule } from './module/user.module';
+import { AuthModule } from './module/auth.module';
+import { SessaoModule } from './module/sessao.module';
+import { ConfigModule } from '@nestjs/config';
+
 
 @Module({
-  imports: [],
+  imports: [UsersModule, AuthModule, SessaoModule, ConfigModule.forRoot({ isGlobal: true})],
   controllers: [
     AppController, 
     FilmeController, 
     SalasController, 
-    SessaoController,
     AssentosController ],
 
   providers: [
