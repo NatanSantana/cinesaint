@@ -14,11 +14,12 @@ export class SessaoRepository {
         where: {
             AND: [
                 {idSessao: { in: idSessoes } },
-                {dataSessao: { lt: new Date()}}
+                {dataSessao: { lt: new Date()}},
+                {statusSessao: "ATIVO"}
             ] },
         data: { statusSessao: "INATIVO" }
-    });
-}
+        });
+    }
 
 
 

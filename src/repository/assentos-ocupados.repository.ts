@@ -8,6 +8,12 @@ import { Injectable } from "@nestjs/common";
 export class AssentosOcupadosRepository {
     constructor(private prismaService: PrismaService) {}
 
+    async excluirAssentosOcupados(idSessao: number[]) {
+        return await this.prismaService.assentosOcupados.deleteMany({
+            where: {idSessao: {in: idSessao}}
+        })
+    }
+
     async registrarAssento(assentoOcupado: createAssentosOcupados) {
         return await this.prismaService
         .assentosOcupados.create({

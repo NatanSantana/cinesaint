@@ -21,6 +21,8 @@ import { UsersModule } from './module/user.module';
 import { AuthModule } from './module/auth.module';
 import { SessaoModule } from './module/sessao.module';
 import { ConfigModule } from '@nestjs/config';
+import { UsersRepository } from './repository/users.repository';
+import { AssentosOcupadosRepository } from './repository/assentos-ocupados.repository';
 
 
 @Module({
@@ -44,7 +46,9 @@ import { ConfigModule } from '@nestjs/config';
     AssentosRepository,
     IngressosRepository,
     IngressoService,
-    PagamentoSessaoRepository
+    PagamentoSessaoRepository,
+    UsersRepository,
+    AssentosOcupadosRepository
   ],
 })
 export class AppModule {}

@@ -9,6 +9,8 @@ import { PagamentoSessaoRepository } from '../repository/pagamento-sessao.reposi
 import { IngressosRepository } from '../repository/ingressos.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthModule } from './auth.module';
+import { UsersRepository } from '../repository/users.repository';
+import { AssentosOcupadosRepository } from '../repository/assentos-ocupados.repository';
 
 @Module({
   imports: [AuthModule],
@@ -22,6 +24,8 @@ import { AuthModule } from './auth.module';
     PagamentoSessaoRepository,
     IngressosRepository,
     PrismaService,
+    UsersRepository,
+    AssentosOcupadosRepository
   ],
 })
 export class SessaoModule {}

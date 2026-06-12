@@ -36,9 +36,9 @@ export class SessaoController {
         return this.sessaoService.listarSessoesByIdFilme(+idFilme);
     }
 
-    @Post('/encerrar-sessoes')
-    async encerrarSessoes(@Body() idSalas: number[]) {
-        return await this.sessaoService.marcarSessoesFinalizadas(idSalas);
+    @Post('/encerrar')
+    async encerrarSessoes(@Body() body: {idSessao: number[]}) {
+        return await this.sessaoService.marcarSessoesFinalizadas(body.idSessao);
     }
 
 }

@@ -130,8 +130,15 @@ export class SessaoService {
     return "pagamento concluído"
     }
 
-    marcarSessoesFinalizadas(idSala: number[]) {
-        return this.sessaoRepository.inativarSessoes(idSala);
+    async marcarSessoesFinalizadas(idSessao: number[]) {
+        if (!idSessao) {
+            throw new BadRequestException("O idSala e o idSessao não podem ser nulos");
+        }
+
+        this.assentosOcupadosRepository.excluirAssentosOcupados(idSessao);
+
+
+        return await this.sessaoRepository.inativarSessoes(idSessao);
     }
 
     listarAllSessoes() {
