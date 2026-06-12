@@ -14,12 +14,26 @@ export class AssentosController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADM')
     registrarAssentos(@Body() assento: CreateAssentosDto) {
-        return this.assentosService.registrarAssentos(assento   );
+        return this.assentosService.registrarAssentos(assento);
     }
 
     @Get(':idSala')
     assentosByIdSala(@Param('idSala') idSala: string) {
         return this.assentosService.assentosByIdSala(+idSala);
+    }
+
+    @Post('/manutencao/:identificacao')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADM')
+    atualizarAssentosComoEmManutencao(@Param() req: {identificacao: string}) {
+        return this.assentosService.atualizarAssentosManutencao(req.identificacao);
+    }
+
+    @Post('/livre/:identificacao')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADM')
+    atualizarAssentosComoLivre(@Param() req: {identificacao: string}) {
+        return this.assentosService.atualizarAssentosComoLivres(req.identificacao);
     }
 
 

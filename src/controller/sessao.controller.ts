@@ -37,6 +37,8 @@ export class SessaoController {
     }
 
     @Post('/encerrar')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('ADM')
     async encerrarSessoes(@Body() body: {idSessao: number[]}) {
         return await this.sessaoService.marcarSessoesFinalizadas(body.idSessao);
     }

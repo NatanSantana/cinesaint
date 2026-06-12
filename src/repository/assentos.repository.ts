@@ -12,6 +12,24 @@ export class AssentosRepository {
         });
     }
 
+
+    async atualizarAssentosComoManutencao(identificacao: string) {
+        return await this.prisma.assentos.update({
+            where: {identificacao: identificacao},
+            data: {statusCadeira: "MANUTENCAO"}
+        })  
+    }
+
+    async atualizarAssentosComoLivre(identificacao: string) {
+        return await this.prisma.assentos.updateMany({
+            where: {
+                AND: [
+                {identificacao: identificacao},
+                {statusCadeira: "MANUTENCAO"}
+            ]}, 
+            data: {statusCadeira: "LIVRE"}
+        })  
+    }
     
 
     allAssentosByIdSala(idSala: number) {
@@ -30,6 +48,12 @@ export class AssentosRepository {
                 }
             }
         });
+    }
+
+    async buscarAssentosByIdentificacao(identificacao: string) {
+        return await this.prisma.assentos.findFirst({
+            where: {identificacao: identificacao}
+        })
     }
 
     async buscarAssentosLivresById(id: number[]) {
