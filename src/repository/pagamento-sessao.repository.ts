@@ -22,4 +22,39 @@ export class PagamentoSessaoRepository {
     });
 }
 
+    async buscarIngressoByCpf(cpf: string) {
+        return await this.prisma.ingressosComprados.findMany({
+            select: {
+                idIngressoComprado: true,
+            },
+            where: {cpf: cpf}
+        })
+    }
+
+    buscarIngressoCompradoById(id: number) {
+        return this.prisma.ingressosComprados.findUnique({
+            select: {
+                idIngressoComprado: true,
+                filme: {
+                    select: {
+                        nome: true,
+                        minutosFilme: true
+                    }  
+                },
+                sessoes: {
+                    select: {
+                        dataSessao: true
+                    }
+                },
+                sala: {
+                    select: {
+                        numero: true,
+                        tierSala: true
+                    }
+                }
+            },
+            where: {idIngressoComprado: id}
+        })
+    }
+
 }

@@ -11,7 +11,19 @@ import { RolesGuard } from "../security/role.guard";
 export class SessaoController {
     constructor(private sessaoService: SessaoService) { }
 
-    
+    @UseGuards(JwtAuthGuard)
+    @Get('/qrcode/:cpf')
+    mostrarQrCode(@Param('cpf') cpf: string) {
+        return this.sessaoService.mostrarQrCode(cpf);
+
+    }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Get('/validar-qrcode/:id')
+    validarQrCode(@Param('id') id: number) {
+        return this.sessaoService.validarIdIngressoComprado(+id);
+    }
+
     @Post()
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('ADM')

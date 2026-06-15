@@ -13,6 +13,7 @@ import { Tiers } from "../enum/tiers.enum";
 import { UsersRepository } from "../repository/users.repository";
 import { AssentosOcupadosRepository } from "../repository/assentos-ocupados.repository";
 import { createAssentosOcupados } from "../DTO/create-assentos-ocupados.dto";
+import QRCode from 'qrcode';
 
 
 @Injectable()
@@ -74,7 +75,6 @@ export class SessaoService {
         return this.sessaoRepository.criarSessao(sessao);
     }
 
-    
     async pagamentoSessao(checkout: PagamentoSessaoDto) {
     const sessao = await this.sessaoRepository.buscarSessaoById(checkout.idSessao);
     if (!sessao) throw new BadRequestException("Sessão não encontrada");
@@ -127,7 +127,34 @@ export class SessaoService {
         await this.assentosOcupadosRepository.registrarAssento(assentos)
     }
 
-    return "pagamento concluído"
+    return "Pagamento Concluído";
+    }
+
+    async mostrarQrCode(cpf: string) {
+        
+        const ingressosComprados = await this.pagamentoSessaoRepository.buscarIngressoByCpf(cpf);
+
+        const ingressosResgatados = await Promise.all(
+        ingressosComprados.map((i) =>
+        QRCode.toDataURL(
+        `http://192.168.1.3:3000/sessao/validar-qrcode/${i.idIngressoComprado}`
+            )
+        )
+    );
+        
+        return ingressosResgatados;    
+    }
+
+    async validarIdIngressoComprado(id: number) {
+        if (!id) {
+            throw new BadRequestException("O id não pode ser null")
+        }
+        const ingressosComprados = this.pagamentoSessaoRepository.buscarIngressoCompradoById(id);
+        if (!ingressosComprados) {
+            throw new NotFoundException("Não foi possível encontrar o ingresso informado")
+        }
+
+        return ingressosComprados;
     }
 
     async marcarSessoesFinalizadas(idSessao: number[]) {
