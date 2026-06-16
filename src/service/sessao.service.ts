@@ -137,7 +137,7 @@ export class SessaoService {
         const ingressosResgatados = await Promise.all(
         ingressosComprados.map((i) =>
         QRCode.toDataURL(
-        `http://192.168.1.3:3000/sessao/validar-qrcode/${i.idIngressoComprado}`
+        `/sessao/validar-qrcode/${i.idIngressoComprado}`
             )
         )
     );
