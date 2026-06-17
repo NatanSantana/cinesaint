@@ -14,6 +14,7 @@ import { UsersRepository } from "../repository/users.repository";
 import { AssentosOcupadosRepository } from "../repository/assentos-ocupados.repository";
 import { createAssentosOcupados } from "../DTO/create-assentos-ocupados.dto";
 import QRCode from 'qrcode';
+import "dotenv/config";
 
 
 @Injectable()
@@ -137,7 +138,7 @@ export class SessaoService {
         const ingressosResgatados = await Promise.all(
         ingressosComprados.map((i) =>
         QRCode.toDataURL(
-        `http://192.168.1.3:3000/sessao/validar-qrcode/${i.idIngressoComprado}`
+        `http://${process.env.IP}:3000/sessao/validar-qrcode/${i.idIngressoComprado}`
             )
         )
     );

@@ -6,6 +6,17 @@ import { CreateUserDto } from "../DTO/create-user.dto";
 @Injectable()
 export class UsersRepository {
     constructor(private prisma: PrismaService) { }
+
+    async trocarSenha(novaSenha: string, email: string) {
+        return this.prisma.users.update({
+            where: {
+                email: email
+            },
+            data: {
+                senha: novaSenha
+            }
+        })
+    }
     
     async findByEmail(email: string) {
         return await this.prisma.users.findUnique({

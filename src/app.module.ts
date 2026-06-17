@@ -26,7 +26,7 @@ import { AssentosOcupadosRepository } from './repository/assentos-ocupados.repos
 
 
 @Module({
-  imports: [UsersModule, AuthModule, SessaoModule, ConfigModule.forRoot({ isGlobal: true})],
+  imports: [ConfigModule.forRoot({ isGlobal: true}), UsersModule, AuthModule, SessaoModule],
   controllers: [
     AppController, 
     FilmeController, 
