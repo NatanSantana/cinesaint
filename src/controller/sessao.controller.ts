@@ -43,7 +43,7 @@ export class SessaoController {
         return this.sessaoService.listarAllSessoes();
     }
 
-    @Get(':idFilme')
+    @Get('/sessoes-by-filme/:idFilme')
     listarSessoesByIdFilme(@Param('idFilme') idFilme: string) {
         return this.sessaoService.listarSessoesByIdFilme(+idFilme);
     }
@@ -54,5 +54,7 @@ export class SessaoController {
     async encerrarSessoes(@Body() body: {idSessao: number[]}) {
         return await this.sessaoService.marcarSessoesFinalizadas(body.idSessao);
     }
+
+    
 
 }

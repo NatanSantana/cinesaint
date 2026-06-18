@@ -113,6 +113,8 @@ export class SessaoService {
 
     
 
+    
+
     await Promise.all(
         assentos.map(s => this.pagamentoSessaoRepository.registrarPagamentoSessao(checkout, s.idAssentos))
     );
