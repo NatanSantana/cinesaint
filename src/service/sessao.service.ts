@@ -15,6 +15,10 @@ import { AssentosOcupadosRepository } from "../repository/assentos-ocupados.repo
 import { createAssentosOcupados } from "../DTO/create-assentos-ocupados.dto";
 import QRCode from 'qrcode';
 import "dotenv/config";
+import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
+import { client } from "../main";
+import { nanoid } from "nanoid";
+import { MetaDataPagamento } from "../DTO/metadata-pagamento.dto";
 
 
 @Injectable()
@@ -94,12 +98,14 @@ export class SessaoService {
     if (!filme)     throw new NotFoundException("Filme não encontrado");
     if (!ingresso)  throw new NotFoundException("Ingresso não encontrado");
     if (!user)      throw new NotFoundException("Usuário não encontrado, confira o CPF")
+    if (!checkout.idAssentos)      throw new NotFoundException("IdAssentos não pode ser null")
+
 
     if (sessao.idFilme !== checkout.idFilme)
         throw new BadRequestException("Filme não corresponde à sessão");
 
     if (!Object.values(Tiers).includes(ingresso.tiers))
-        throw new BadRequestException("Tier do ingresso inválido");
+        throw new BadRequestException("Tier do ingresso inválido (não existe)");
 
     if (ingresso.tiers !== sala.tierSala)
         throw new BadRequestException("Ingresso incompatível com o tier da sala");
@@ -111,26 +117,43 @@ export class SessaoService {
         throw new BadRequestException("Um ou mais assentos não estão disponíveis");
     ;
 
-    
-
-    
-
-    await Promise.all(
-        assentos.map(s => this.pagamentoSessaoRepository.registrarPagamentoSessao(checkout, s.idAssentos))
-    );
-
     for (let i of assentos) {
+        //verifica se os assentos selecionados já existem na tabela de assentos ocupados
         const isAssentoOcupado = await this.assentosOcupadosRepository.isAssentoOcupado(i.idAssentos, checkout.idSessao)
         if (isAssentoOcupado === true) {
             throw new ConflictException("Todos os assentos selecionados devem estar livres")
         }
 
-
-        const assentos = new createAssentosOcupados(i.idAssentos, checkout.idSessao)
-        await this.assentosOcupadosRepository.registrarAssento(assentos)
     }
 
-    return "Pagamento Concluído";
+    const preference = new Preference(client);
+
+    const gerarPedido = await preference.create({
+        body: {
+            items: [
+                {
+                id: nanoid(5),
+                title: filme.nome,
+                quantity: assentos.length,
+                unit_price: ingresso.valor
+                }
+            ],
+            metadata: {
+                    idSessao: checkout.idSessao,
+                    idAssentos: checkout.idAssentos.join(","),
+                    idSala: checkout.idSala,
+                    idFilme: checkout.idFilme,
+                    idIngresso: checkout.idIngresso,
+                    cpfCliente: checkout.cpfCliente
+            }
+        }
+    })
+
+    const pedido = {
+        link: gerarPedido.init_point
+    }
+
+    return pedido;
     }
 
     async mostrarQrCode(cpf: string) {
@@ -147,6 +170,47 @@ export class SessaoService {
         
         return ingressosResgatados;    
     }
+
+    async finalizarCompra(paymentId: string) {
+    const payment = new Payment(client)
+    const result = await payment.get({ id: paymentId })
+
+    const metadata = result.metadata
+
+    if (!metadata.id_assentos) {
+        console.warn("Notificação duplicada")
+        return "Notificação duplicada"
+    }
+
+    if (result.status === 'approved') {
+        const idAssentos = metadata.id_assentos.split(",").map(Number)
+
+        for (let i of idAssentos) {
+            await this.assentosOcupadosRepository.registrarAssento(
+                new createAssentosOcupados(i, metadata.id_sessao)
+            )
+
+            await this.pagamentoSessaoRepository.registrarPagamentoSessao(
+                new PagamentoSessaoDto(
+                    metadata.id_sessao,
+                    metadata.id_sala,
+                    metadata.id_filme,
+                    metadata.id_ingresso,
+                    metadata.cpf_cliente
+                ), i
+            )
+        }
+
+        return "Pagamento Concluído"
+    } else if (result.status){
+        console.log("Pagamento já processado");
+        
+    } 
+    
+    else {
+        throw new BadRequestException("A compra falhou")
+    }
+}
 
     async validarIdIngressoComprado(id: number) {
         if (!id) {

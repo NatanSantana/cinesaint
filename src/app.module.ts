@@ -23,6 +23,7 @@ import { SessaoModule } from './module/sessao.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersRepository } from './repository/users.repository';
 import { AssentosOcupadosRepository } from './repository/assentos-ocupados.repository';
+import { MercadoPagoController } from './controller/mercadopago.controller';
 
 
 @Module({
@@ -31,7 +32,8 @@ import { AssentosOcupadosRepository } from './repository/assentos-ocupados.repos
     AppController, 
     FilmeController, 
     SalasController, 
-    AssentosController ],
+    AssentosController,
+    MercadoPagoController ],
 
   providers: [
     AppService, 

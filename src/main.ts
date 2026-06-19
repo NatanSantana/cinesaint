@@ -2,13 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import 'dotenv/config';
-
+import { MercadoPagoConfig, Preference } from 'mercadopago';
 
 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
   await app.listen(3000, '0.0.0.0');
 
   app.useGlobalPipes(new ValidationPipe({
@@ -18,6 +17,7 @@ async function bootstrap() {
 }))
 
 }
+export const client = new MercadoPagoConfig({ accessToken: `${process.env.KEY}` });
 bootstrap();
 
 
