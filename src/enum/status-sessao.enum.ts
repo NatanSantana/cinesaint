@@ -1,1 +1,1 @@
-export { StatusSessao } from "@prisma/client";
+export { StatusSessao } from '@prisma/client';

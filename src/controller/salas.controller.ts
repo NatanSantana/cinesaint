@@ -1,33 +1,30 @@
-import { Controller, Get, Post } from "@nestjs/common";
-import { SalasService } from "../service/salas.service";
-import { CreateSalaDto } from "../DTO/create-sala.dto";
-import { Body } from "@nestjs/common/decorators";
-import { Param, UseGuards } from "@nestjs/common/decorators";
-import { JwtAuthGuard } from "../security/jwt-auth.guard";
-import { RolesGuard } from "../security/role.guard";
-import { Roles } from "../decorator/roles.decorator";
-
+import { Controller, Get, Post } from '@nestjs/common';
+import { SalasService } from '../service/salas.service';
+import { CreateSalaDto } from '../DTO/create-sala.dto';
+import { Body } from '@nestjs/common/decorators';
+import { Param, UseGuards } from '@nestjs/common/decorators';
+import { JwtAuthGuard } from '../security/jwt-auth.guard';
+import { RolesGuard } from '../security/role.guard';
+import { Roles } from '../decorator/roles.decorator';
 
 @Controller('/salas')
 export class SalasController {
-    constructor(private salasService: SalasService) { }
+  constructor(private salasService: SalasService) {}
 
+  @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADM')
+  async cadastrarSala(@Body() sala: CreateSalaDto) {
+    return await this.salasService.cadastrarSala(sala);
+  }
 
-    @Post()
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles('ADM')
-    async cadastrarSala(@Body() sala: CreateSalaDto) {
-        return await this.salasService.cadastrarSala(sala);
-    }
+  @Get()
+  async listarSalas() {
+    return await this.salasService.listarSalas();
+  }
 
-    @Get()
-    async listarSalas() {
-        return await this.salasService.listarSalas();
-    }
-
-    @Get(':numero')
-    async getSalaByNumero(@Param('numero') numero: string) {
-        return await this.salasService.buscarSalaPorNumero(+numero);
-    }
-
+  @Get(':numero')
+  async getSalaByNumero(@Param('numero') numero: string) {
+    return await this.salasService.buscarSalaPorNumero(+numero);
+  }
 }

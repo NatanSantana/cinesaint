@@ -1,16 +1,15 @@
-import { IsNotEmpty } from "class-validator";
-import { Tiers } from "../enum/tiers.enum";
+import { IsNotEmpty } from 'class-validator';
+import { Tiers } from '../enum/tiers.enum';
 
 export class IngressoDto {
+  @IsNotEmpty()
+  valor: number;
 
-    @IsNotEmpty()
-    valor: number
-    
-    @IsNotEmpty()
-    tiers: Tiers
+  @IsNotEmpty()
+  tiers: Tiers;
 
-    constructor(valor: number, tiers: Tiers) {
-        this.valor = valor
-        this.tiers = tiers
-    }
+  constructor(valor: number, tiers: Tiers) {
+    this.valor = valor;
+    this.tiers = tiers;
+  }
 }

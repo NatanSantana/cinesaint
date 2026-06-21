@@ -25,7 +25,7 @@ import { AssentosOcupadosRepository } from '../repository/assentos-ocupados.repo
     IngressosRepository,
     PrismaService,
     UsersRepository,
-    AssentosOcupadosRepository
+    AssentosOcupadosRepository,
   ],
 })
 export class SessaoModule {}

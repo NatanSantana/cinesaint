@@ -8,7 +8,6 @@ import { FilmeRepository } from './repository/filme.repository';
 import { SalasController } from './controller/salas.controller';
 import { SalasRepository } from './repository/salas.repository';
 import { SalasService } from './service/salas.service';
-import { SessaoController } from './controller/sessao.controller';
 import { SessaoService } from './service/sessao.service';
 import { SessaoRepository } from './repository/sessao.repository';
 import { AssentosController } from './controller/assentos.controller';
@@ -25,23 +24,28 @@ import { UsersRepository } from './repository/users.repository';
 import { AssentosOcupadosRepository } from './repository/assentos-ocupados.repository';
 import { MercadoPagoController } from './controller/mercadopago.controller';
 
-
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true}), UsersModule, AuthModule, SessaoModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    UsersModule,
+    AuthModule,
+    SessaoModule,
+  ],
   controllers: [
-    AppController, 
-    FilmeController, 
-    SalasController, 
+    AppController,
+    FilmeController,
+    SalasController,
     AssentosController,
-    MercadoPagoController ],
+    MercadoPagoController,
+  ],
 
   providers: [
-    AppService, 
-    FilmesService, 
-    PrismaService, 
-    FilmeRepository, 
-    SalasService, 
-    SalasRepository, 
+    AppService,
+    FilmesService,
+    PrismaService,
+    FilmeRepository,
+    SalasService,
+    SalasRepository,
     SessaoService,
     SessaoRepository,
     AssentosService,
@@ -50,7 +54,7 @@ import { MercadoPagoController } from './controller/mercadopago.controller';
     IngressoService,
     PagamentoSessaoRepository,
     UsersRepository,
-    AssentosOcupadosRepository
+    AssentosOcupadosRepository,
   ],
 })
 export class AppModule {}
