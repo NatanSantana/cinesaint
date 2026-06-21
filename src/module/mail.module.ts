@@ -10,7 +10,7 @@ import 'dotenv/config';
         port: Number(process.env.MAIL_PORT),
         auth: {
           user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASST,
+          pass: process.env.MAIL_PASS,
         },
       },
       defaults: {
