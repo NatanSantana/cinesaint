@@ -236,11 +236,16 @@ export class SessaoService {
         if (!idSessao) {
             throw new BadRequestException("O idSala e o idSessao não podem ser nulos");
         }
+        const sessoesInativadas = await this.sessaoRepository.inativarSessoes(idSessao);
+        if (sessoesInativadas.count === 0) {
+            throw new BadRequestException("Não foi possível encontrar sessoes que já acabaram, verifique a DATA")
+        }
 
-        this.assentosOcupadosRepository.excluirAssentosOcupados(idSessao);
+        const assentosExcluidos = await this.assentosOcupadosRepository.excluirAssentosOcupados(idSessao);
 
+        const quantidadeAtingida = { qtde: assentosExcluidos.count };
 
-        return await this.sessaoRepository.inativarSessoes(idSessao);
+        return quantidadeAtingida
     }
 
     listarAllSessoes() {
