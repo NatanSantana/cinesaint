@@ -15,10 +15,10 @@ import { AssentosOcupadosRepository } from "../repository/assentos-ocupados.repo
 import { createAssentosOcupados } from "../DTO/create-assentos-ocupados.dto";
 import QRCode from 'qrcode';
 import "dotenv/config";
-import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
+import { Payment, Preference } from 'mercadopago';
 import { client } from "../main";
 import { nanoid } from "nanoid";
-import { MetaDataPagamento } from "../DTO/metadata-pagamento.dto";
+
 
 
 @Injectable()
@@ -119,6 +119,12 @@ export class SessaoService {
 
     for (let i of assentos) {
         //verifica se os assentos selecionados já existem na tabela de assentos ocupados
+        
+        if (i.idSala !== checkout.idSala) {
+            throw new ConflictException("O Assento não pertence a sala selecionada");
+        }
+
+
         const isAssentoOcupado = await this.assentosOcupadosRepository.isAssentoOcupado(i.idAssentos, checkout.idSessao)
         if (isAssentoOcupado === true) {
             throw new ConflictException("Todos os assentos selecionados devem estar livres")
@@ -172,6 +178,7 @@ export class SessaoService {
     }
 
     async finalizarCompra(paymentId: string) {
+
     const payment = new Payment(client)
     const result = await payment.get({ id: paymentId })
 
@@ -202,8 +209,9 @@ export class SessaoService {
         }
 
         return "Pagamento Concluído"
-    } else if (result.status){
-        console.log("Pagamento já processado");
+    } else if (result.status === 'pending'){
+        console.log("Status Compra: " + result.status)
+        console.log("Pagamento pendente");
         
     } 
     
