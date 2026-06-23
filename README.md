@@ -115,7 +115,3 @@ Salas ─┬─< Assentos
 Users
 ResetPassword
 ```
-
-## Licença
-
-Projeto acadêmico/pessoal sem licença definida.
