@@ -54,7 +54,7 @@ SIGNATURE="<webhook secret do Mercado Pago>"
 MAIL_HOST="smtp.gmail.com"
 MAIL_PORT=587
 MAIL_USER="seuemail@gmail.com"
-MAIL_PASST="<senha de app>"
+MAIL_PASS="<senha de app>"
 IP="<host público, ex.: ngrok>"
 ```
 
@@ -115,7 +115,3 @@ Salas ─┬─< Assentos
 Users
 ResetPassword
 ```
-
-## Licença
-
-Projeto acadêmico/pessoal sem licença definida.
