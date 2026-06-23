@@ -18,15 +18,19 @@ export class CreateFilmeDto {
   @Min(60)
   minutosFilme: number;
 
+  lancamento: Date;
+
   constructor(
     nome: string,
     categoria: string,
     classificacaoIndicativa: number,
     minutosFilme: number,
+    lancamento: Date,
   ) {
     this.nome = nome;
     this.categoria = categoria;
     this.classificacaoIndicativa = classificacaoIndicativa;
     this.minutosFilme = minutosFilme;
+    this.lancamento = lancamento;
   }
 }

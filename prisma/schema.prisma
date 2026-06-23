@@ -31,7 +31,8 @@ enum Tiers {
     COMUM 
     IMERSIVO 
     DELUX 
-    IMAX 
+    IMAX
+    ESTUDANTIL
     
 }
 
@@ -140,11 +141,12 @@ model Sessao {
 }
 
 model Filme {
-  idFilme                 Int    @id @default(autoincrement())
-  nome                    String @unique
+  idFilme                 Int       @id @default(autoincrement())
+  nome                    String    @unique
   categoria               String
   classificacaoIndicativa Int
-  minutosFilme            Int    @default(60)
+  minutosFilme            Int       @default(60)
+  lancamento              DateTime  
 
   sessoes Sessao[]
 

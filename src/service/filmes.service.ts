@@ -16,7 +16,7 @@ export class FilmesService {
 
     if (filmeExistente !== null) {
       throw new ConflictException(
-        'Já existe um filme cadastrado com esse nome!',
+        'Já existe um filme cadastrado com esse nome',
       );
     }
 
