@@ -3,13 +3,18 @@ import { SessaoService } from '../service/sessao.service';
 import {
   WebhookSignatureValidator,
   InvalidWebhookSignatureError,
+  Payment,
 } from 'mercadopago';
 import 'dotenv/config';
 import { UnauthorizedException } from '@nestjs/common';
+import { client } from '../main';
+import { ProdutosService } from '../service/produtos.service';
 
 @Controller('/mercadopago')
 export class MercadoPagoController {
-  constructor(private sessaoService: SessaoService) {}
+  constructor(private sessaoService: SessaoService,
+    private produtoService: ProdutosService
+  ) {}
 
   @Post('/webhook')
   async handleWebhook(
@@ -34,7 +39,15 @@ export class MercadoPagoController {
       throw err;
     }
 
-    await this.sessaoService.finalizarCompra(body.data.id);
+    const payment = new Payment(client);
+    const result = await payment.get({id: body.data.id});
+
+    if (result.metadata.tipoCompra === 'snacks') {
+      return await this.produtoService.finalizarCompraProduto(result.metadata, result.status, body.data.id);
+    }
+
+    if (result.metadata.tipoCompra === 'ingressos')
+      return await this.sessaoService.finalizarCompra(result.metadata, result.status);
     console.log(body);
   }
 }

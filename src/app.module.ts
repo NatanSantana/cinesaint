@@ -23,6 +23,9 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersRepository } from './repository/users.repository';
 import { AssentosOcupadosRepository } from './repository/assentos-ocupados.repository';
 import { MercadoPagoController } from './controller/mercadopago.controller';
+import { ProdutosService } from './service/produtos.service';
+import { ProdutosRepository } from './repository/produtos.repository';
+import { ProdutosController } from './controller/produto.controller';
 
 @Module({
   imports: [
@@ -37,6 +40,7 @@ import { MercadoPagoController } from './controller/mercadopago.controller';
     SalasController,
     AssentosController,
     MercadoPagoController,
+    ProdutosController
   ],
 
   providers: [
@@ -55,6 +59,8 @@ import { MercadoPagoController } from './controller/mercadopago.controller';
     PagamentoSessaoRepository,
     UsersRepository,
     AssentosOcupadosRepository,
+    ProdutosService,
+    ProdutosRepository
   ],
 })
 export class AppModule {}

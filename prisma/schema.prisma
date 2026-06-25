@@ -41,6 +41,32 @@ enum StatusCadeira {
     LIVRE
 }
 
+
+model Produtos {
+  idProduto   Int       @id @default(autoincrement())
+  nome        String    @unique
+  categoria   String
+  valor       Int
+
+  produtosComprados   ProdutosComprados[]
+
+
+  @@map("produtos")
+}
+
+model ProdutosComprados {
+  idProdutoComprado      Int        @id @default(autoincrement())
+
+  idProduto              Int
+  produtos               Produtos   @relation(fields: [idProduto], references: [idProduto])
+
+  cpf                   String? 
+
+  @@map("produtosComprados")
+
+}
+
+
 model Salas {
   idSalas  Int    @id @default(autoincrement())
   numero   Int    @unique

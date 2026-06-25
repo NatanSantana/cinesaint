@@ -176,6 +176,7 @@ export class SessaoService {
           },
         ],
         metadata: {
+          tipoCompra: 'ingressos',
           idSessao: checkout.idSessao,
           idAssentos: checkout.idAssentos.join(','),
           idSala: checkout.idSala,
@@ -208,18 +209,14 @@ export class SessaoService {
     return ingressosResgatados;
   }
 
-  async finalizarCompra(paymentId: string) {
-    const payment = new Payment(client);
-    const result = await payment.get({ id: paymentId });
-
-    const metadata = result.metadata;
+  async finalizarCompra(metadata: any, status: string | undefined) {
 
     if (!metadata.id_assentos) {
       console.warn('Notificação duplicada');
       return 'Notificação duplicada';
     }
 
-    if (result.status === 'approved') {
+    if (status === 'approved') {
       const idAssentos = metadata.id_assentos.split(',').map(Number);
 
       for (const i of idAssentos) {
@@ -240,8 +237,8 @@ export class SessaoService {
       }
 
       return 'Pagamento Concluído';
-    } else if (result.status === 'pending') {
-      console.log('Status Compra: ' + result.status);
+    } else if (status === 'pending') {
+      console.log('Status Compra: ' + status);
       console.log('Pagamento pendente');
     } else {
       throw new BadRequestException('A compra falhou');
