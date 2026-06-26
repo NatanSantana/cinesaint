@@ -24,20 +24,45 @@ export class ProdutosService {
 
 
     async comprar(checkout: CreateCompraProdutoDto) {
-        const produtos = await this.produtosRepository.listarProdutosById(checkout.idProduto);
-
-        if (!produtos) {
-            throw new NotFoundException("Nenhum produto foi encontrado");
-        }
 
         let precoTotal = 0;
         let nomeProdutos: string[] = [];
 
-        for (let i of produtos) {
-            precoTotal += i.valor;
-            nomeProdutos.push(i.nome)
+        let produtoAnterior = {
+            idProduto: [0],
+            nome: "",
+            valor: 0
         }
+
+        for (let i of checkout.idProdutos) {
+
+            if (!produtoAnterior.idProduto.includes(i)) {
+                const produto = await this.produtosRepository
+                    .listarProdutoById(i);
+
+            if (!produto) {
+                throw new NotFoundException("Produto não foi encontrado");
+            }
+
+
+
+            precoTotal += produto.valor;
+
+            if (!nomeProdutos.includes(produto.nome)) {
+                nomeProdutos.push(produto.nome);
+            }
+
+            produtoAnterior.idProduto.push(i);
+            produtoAnterior.nome = produto.nome;
+            produtoAnterior.valor = produto.valor;
+
+            } else {
+                precoTotal += produtoAnterior.valor;
+            }
+            
+
         
+        }
 
         const preference = new Preference(client);
 
@@ -55,7 +80,7 @@ export class ProdutosService {
                 metadata: {
                     tipoCompra: "snacks",
                     cpf: checkout.cpf,
-                    idProdutos: checkout.idProduto
+                    idProdutos: checkout.idProdutos
                 }
             }
         })
@@ -67,15 +92,13 @@ export class ProdutosService {
     }
 
     async finalizarCompraProduto(metadata: any, status: string | undefined, id: number) {
-
-        if (!metadata.id_produto) {
-            console.warn('notificação duplicada')
-            return
-        }
-
-        if (status === 'approved') {
+        
+        
+        if (status == 'approved') {
             for (let i of metadata.id_produtos) {
-                this.produtosRepository.registrarCompra(i,metadata.cpf)
+                
+                await this.produtosRepository.registrarCompra(i,metadata.cpf)
+                
             }
 
 

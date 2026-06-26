@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateProdutoDto } from "../DTO/create-produto.dto";
-import { CreateCompraProdutoDto } from "../DTO/create-compra-produto.dto";
+
 
 
 @Injectable()
@@ -15,10 +15,14 @@ export class ProdutosRepository {
         })
     }
 
-    listarProdutosById(id: number[]) {
-        return this.prisma.produtos.findMany({
+    listarProdutoById(id: number) {
+        return this.prisma.produtos.findUnique({
+            select: {
+                nome: true,
+                valor: true
+            },
             where: {
-                idProduto: {in: id}
+                idProduto: id
             }
         })
     }
@@ -27,8 +31,8 @@ export class ProdutosRepository {
         return this.prisma.produtos.findMany();
     }
 
-    registrarCompra(idProduto: number, cpf: string) {
-        return this.prisma.produtosComprados.create({
+    async registrarCompra(idProduto: number, cpf: string) {
+        return await this.prisma.produtosComprados.create({
             data: {
                 idProduto: idProduto,
                 cpf: cpf

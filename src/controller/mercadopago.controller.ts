@@ -41,12 +41,13 @@ export class MercadoPagoController {
 
     const payment = new Payment(client);
     const result = await payment.get({id: body.data.id});
+    
 
-    if (result.metadata.tipoCompra === 'snacks') {
+    if (result.metadata.tipo_compra === 'snacks') {
       return await this.produtoService.finalizarCompraProduto(result.metadata, result.status, body.data.id);
     }
 
-    if (result.metadata.tipoCompra === 'ingressos')
+    if (result.metadata.tipo_compra === 'ingressos')
       return await this.sessaoService.finalizarCompra(result.metadata, result.status);
     console.log(body);
   }

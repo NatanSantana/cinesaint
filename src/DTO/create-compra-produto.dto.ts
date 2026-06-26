@@ -1,17 +1,11 @@
-interface Produto {
-    idProduto: number
-    quantidade: number
-}
-
-
 
 export class CreateCompraProdutoDto {
-    produto: Produto
+    idProdutos: number[]
     
     cpf: string
 
-    constructor(produto: Produto, cpf: string) {
-        this.produto = produto,
+    constructor(idProdutos: number[], cpf: string) {
+        this.idProdutos = idProdutos,
         this.cpf = cpf
     }
 }

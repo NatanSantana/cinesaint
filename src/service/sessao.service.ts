@@ -211,10 +211,6 @@ export class SessaoService {
 
   async finalizarCompra(metadata: any, status: string | undefined) {
 
-    if (!metadata.id_assentos) {
-      console.warn('Notificação duplicada');
-      return 'Notificação duplicada';
-    }
 
     if (status === 'approved') {
       const idAssentos = metadata.id_assentos.split(',').map(Number);
@@ -235,7 +231,7 @@ export class SessaoService {
           i,
         );
       }
-
+      console.warn("Pagamento de ingressos Concluído")
       return 'Pagamento Concluído';
     } else if (status === 'pending') {
       console.log('Status Compra: ' + status);
