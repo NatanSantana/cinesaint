@@ -4,9 +4,10 @@ import {
   WebhookSignatureValidator,
   InvalidWebhookSignatureError,
   Payment,
+  PaymentRefund,
 } from 'mercadopago';
 import 'dotenv/config';
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { client } from '../main';
 import { ProdutosService } from '../service/produtos.service';
 
@@ -14,6 +15,7 @@ import { ProdutosService } from '../service/produtos.service';
 export class MercadoPagoController {
   constructor(private sessaoService: SessaoService,
     private produtoService: ProdutosService
+    
   ) {}
 
   @Post('/webhook')
@@ -41,14 +43,31 @@ export class MercadoPagoController {
 
     const payment = new Payment(client);
     const result = await payment.get({id: body.data.id});
+    const refundClient = new PaymentRefund(client);
+    const valorCompra = result.transaction_amount;
     
-
-    if (result.metadata.tipo_compra === 'snacks') {
+    try {
+      if (result.metadata.tipo_compra === 'snacks') {
       return await this.produtoService.finalizarCompraProduto(result.metadata, result.status, body.data.id);
     }
 
     if (result.metadata.tipo_compra === 'ingressos')
       return await this.sessaoService.finalizarCompra(result.metadata, result.status);
     console.log(body);
+    } catch (error) {
+        console.warn("O registro da compra falhou, PROCESSANDO REEMBOLSO...")
+        if (result.transaction_amount === undefined) {
+            throw new InternalServerErrorException('Valor da transação não encontrado para reembolso');
+        }
+        const refund = await refundClient.create({
+          payment_id: body.data.id,
+          body: {
+            amount: result.transaction_amount
+          }
+        })
+        console.warn("Reembolso concedido")
+        return refund;
+    }
+    
   }
 }

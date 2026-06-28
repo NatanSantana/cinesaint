@@ -26,6 +26,7 @@ import { MercadoPagoController } from './controller/mercadopago.controller';
 import { ProdutosService } from './service/produtos.service';
 import { ProdutosRepository } from './repository/produtos.repository';
 import { ProdutosController } from './controller/produto.controller';
+import { PaymentRefund } from 'mercadopago';
 
 @Module({
   imports: [
@@ -60,7 +61,8 @@ import { ProdutosController } from './controller/produto.controller';
     UsersRepository,
     AssentosOcupadosRepository,
     ProdutosService,
-    ProdutosRepository
+    ProdutosRepository,
+    PaymentRefund
   ],
 })
 export class AppModule {}

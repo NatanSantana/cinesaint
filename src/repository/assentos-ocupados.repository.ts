@@ -1,7 +1,7 @@
 import { createAssentosOcupados } from '../DTO/create-assentos-ocupados.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-
+import { Prisma } from '@prisma/client';
 @Injectable()
 export class AssentosOcupadosRepository {
   constructor(private prismaService: PrismaService) {}
@@ -12,8 +12,8 @@ export class AssentosOcupadosRepository {
     });
   }
 
-  async registrarAssento(assentoOcupado: createAssentosOcupados) {
-    return await this.prismaService.assentosOcupados.create({
+  async registrarAssentoOcupado(tx: Prisma.TransactionClient, assentoOcupado: createAssentosOcupados) {
+    return await tx.assentosOcupados.create({
       data: assentoOcupado,
     });
   }

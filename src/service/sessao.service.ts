@@ -24,9 +24,10 @@ import { AssentosOcupadosRepository } from '../repository/assentos-ocupados.repo
 import { createAssentosOcupados } from '../DTO/create-assentos-ocupados.dto';
 import QRCode from 'qrcode';
 import 'dotenv/config';
-import { Payment, Preference } from 'mercadopago';
+import { Preference } from 'mercadopago';
 import { client } from '../main';
 import { nanoid } from 'nanoid';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SessaoService {
@@ -39,6 +40,7 @@ export class SessaoService {
     private ingressoRepository: IngressosRepository,
     private userRepository: UsersRepository,
     private assentosOcupadosRepository: AssentosOcupadosRepository,
+    private prisma: PrismaService
   ) {}
 
   async criarSessao(sessao: CreateSessaoDto) {
@@ -101,6 +103,11 @@ export class SessaoService {
   }
 
   async pagamentoSessao(checkout: PagamentoSessaoDto) {
+    let idIngressoVisitado: number = 0;
+    let precoIngresso: number =  0;
+    let precoTotal: number = 0;
+
+
     const sessao = await this.sessaoRepository.buscarSessaoById(
       checkout.idSessao,
     );
@@ -109,29 +116,53 @@ export class SessaoService {
     if (isBefore(sessao.dataSessao, new Date()))
       throw new BadRequestException('Sessão já iniciada');
 
-    const [sala, filme, ingresso, user] = await Promise.all([
+    const [sala, filme, user] = await Promise.all([
       this.salaRepository.searchById(checkout.idSala),
       this.filmeRepository.searchById(checkout.idFilme),
-      this.ingressoRepository.buscarIngressoById(checkout.idIngresso),
       this.userRepository.findByCpf(checkout.cpfCliente),
     ]);
 
     if (!sala) throw new NotFoundException('Sala não encontrada');
     if (!filme) throw new NotFoundException('Filme não encontrado');
-    if (!ingresso) throw new NotFoundException('Ingresso não encontrado');
     if (!user)
       throw new NotFoundException('Usuário não encontrado, confira o CPF');
+
+    for (let i of checkout.ingresso) {
+      if (i.idIngresso !== idIngressoVisitado) {
+
+        const ingresso = await this.ingressoRepository.buscarIngressoById(i.idIngresso);
+        if (!ingresso) throw new NotFoundException('Ingresso não encontrado');
+
+        if (!Object.values(Tiers).includes(ingresso.tiers))
+        throw new BadRequestException('Tier do ingresso inválido (não existe)');
+
+        if (ingresso.tiers !== sala.tierSala) 
+          throw new BadRequestException('Ingresso incompatível com o tier da sala');
+
+        precoIngresso = ingresso.valor;
+
+        // divide o preço do ingresso na metade se for estudante
+        if (i.isEstudante === true) ingresso.valor = ingresso.valor / 2
+
+        idIngressoVisitado = i.idIngresso;
+        precoTotal += ingresso.valor 
+        
+      } else {
+
+          // Se o segundo ingresso for um estudante, vai somar pela metade do valor do ingresso, 
+          // se não for, vai somar pelo preço integral
+          precoTotal += i.isEstudante === true ? precoIngresso / 2 : precoIngresso;
+      }
+         
+    }
+
+    
     if (!checkout.idAssentos)
       throw new NotFoundException('IdAssentos não pode ser null');
 
     if (sessao.idFilme !== checkout.idFilme)
       throw new BadRequestException('Filme não corresponde à sessão');
 
-    if (!Object.values(Tiers).includes(ingresso.tiers))
-      throw new BadRequestException('Tier do ingresso inválido (não existe)');
-
-    if (ingresso.tiers !== sala.tierSala)
-      throw new BadRequestException('Ingresso incompatível com o tier da sala');
 
     // busca o objeto inteiro do assento
     const assentos = await this.assentoRepository.buscarAssentosLivresById(
@@ -142,6 +173,10 @@ export class SessaoService {
       throw new BadRequestException(
         'Um ou mais assentos não estão disponíveis',
       );
+
+    if (assentos.length !== checkout.ingresso.map((i) => i.idIngresso).length) {
+      throw new BadRequestException("A quantidade de assentos deve ser a mesma quantidade de ingressos")
+    }
     for (const i of assentos) {
       //verifica se os assentos selecionados já existem na tabela de assentos ocupados
 
@@ -163,16 +198,20 @@ export class SessaoService {
       }
     }
 
-    const preference = new Preference(client);
+    
+    
 
+
+    const preference = new Preference(client);
+    
     const gerarPedido = await preference.create({
       body: {
         items: [
           {
             id: nanoid(5),
             title: filme.nome,
-            quantity: assentos.length,
-            unit_price: ingresso.valor,
+            quantity: 1,
+            unit_price: precoTotal,
           },
         ],
         metadata: {
@@ -181,7 +220,7 @@ export class SessaoService {
           idAssentos: checkout.idAssentos.join(','),
           idSala: checkout.idSala,
           idFilme: checkout.idFilme,
-          idIngresso: checkout.idIngresso,
+          idIngresso: idIngressoVisitado,
           cpfCliente: checkout.cpfCliente,
         },
       },
@@ -210,17 +249,18 @@ export class SessaoService {
   }
 
   async finalizarCompra(metadata: any, status: string | undefined) {
+  if (status === 'approved') {
+    const idAssentos = metadata.id_assentos.split(',').map(Number);
 
-
-    if (status === 'approved') {
-      const idAssentos = metadata.id_assentos.split(',').map(Number);
-
+    await this.prisma.$transaction(async (tx) => {
       for (const i of idAssentos) {
-        await this.assentosOcupadosRepository.registrarAssento(
+        await this.assentosOcupadosRepository.registrarAssentoOcupado(
+          tx,
           new createAssentosOcupados(i, metadata.id_sessao),
         );
 
         await this.pagamentoSessaoRepository.registrarPagamentoSessao(
+          tx,
           new PagamentoSessaoDto(
             metadata.id_sessao,
             metadata.id_sala,
@@ -229,17 +269,20 @@ export class SessaoService {
             metadata.cpf_cliente,
           ),
           i,
+          metadata.id_ingresso,
         );
       }
-      console.warn("Pagamento de ingressos Concluído")
-      return 'Pagamento Concluído';
-    } else if (status === 'pending') {
-      console.log('Status Compra: ' + status);
-      console.log('Pagamento pendente');
-    } else {
-      throw new BadRequestException('A compra falhou');
-    }
+    });
+
+    console.warn('Pagamento de ingressos Concluído');
+    return 'Pagamento Concluído';
+  } else if (status === 'pending') {
+    console.log('Status Compra: ' + status);
+    console.log('Pagamento pendente');
+  } else {
+    throw new BadRequestException('A compra falhou');
   }
+}
 
   async validarIdIngressoComprado(id: number) {
     if (!id) {

@@ -1,5 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
 
+interface Ingresso {
+  idIngresso: number,
+  isEstudante: boolean
+}
+
 export class PagamentoSessaoDto {
   @IsNotEmpty()
   idSessao: number;
@@ -14,22 +19,26 @@ export class PagamentoSessaoDto {
   idFilme: number;
 
   @IsNotEmpty()
-  idIngresso: number;
+  ingresso: Ingresso[];
 
   @IsNotEmpty()
   cpfCliente: string;
+
+  
 
   constructor(
     idSessao: number,
     idSala: number,
     idFilme: number,
-    idIngresso: number,
+    ingresso: Ingresso[],
     cpfCliente: string,
+    
   ) {
     this.idSessao = idSessao;
     this.idSala = idSala;
     this.idFilme = idFilme;
-    this.idIngresso = idIngresso;
+    this.ingresso = ingresso;
     this.cpfCliente = cpfCliente;
+    
   }
 }
