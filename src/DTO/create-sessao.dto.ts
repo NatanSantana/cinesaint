@@ -1,6 +1,5 @@
 import { IsInt, IsNotEmpty, Min } from 'class-validator';
 
-
 export class CreateSessaoDto {
   @IsNotEmpty()
   dataSessao: Date;

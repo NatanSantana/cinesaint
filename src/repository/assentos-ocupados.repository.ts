@@ -12,7 +12,10 @@ export class AssentosOcupadosRepository {
     });
   }
 
-  async registrarAssentoOcupado(tx: Prisma.TransactionClient, assentoOcupado: createAssentosOcupados) {
+  async registrarAssentoOcupado(
+    tx: Prisma.TransactionClient,
+    assentoOcupado: createAssentosOcupados,
+  ) {
     return await tx.assentosOcupados.create({
       data: assentoOcupado,
     });

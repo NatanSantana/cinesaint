@@ -16,10 +16,10 @@ export class SessaoController {
     return this.sessaoService.mostrarQrCode(cpf);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Get('/validar-qrcode/:id')
-  validarQrCode(@Param('id') id: number) {
-    return this.sessaoService.validarIdIngressoComprado(+id);
+  
+  @Get('/validar-qrcode/:cpf')
+  validarQrCode(@Param('cpf') cpf: string) {
+    return this.sessaoService.validarIdIngressoComprado(cpf);
   }
 
   @Post()

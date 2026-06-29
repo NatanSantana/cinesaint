@@ -41,7 +41,7 @@ import { PaymentRefund } from 'mercadopago';
     SalasController,
     AssentosController,
     MercadoPagoController,
-    ProdutosController
+    ProdutosController,
   ],
 
   providers: [
@@ -62,7 +62,7 @@ import { PaymentRefund } from 'mercadopago';
     AssentosOcupadosRepository,
     ProdutosService,
     ProdutosRepository,
-    PaymentRefund
+    PaymentRefund,
   ],
 })
 export class AppModule {}

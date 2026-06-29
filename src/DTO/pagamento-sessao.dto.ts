@@ -1,8 +1,8 @@
 import { IsNotEmpty } from 'class-validator';
 
 interface Ingresso {
-  idIngresso: number,
-  isEstudante: boolean
+  idIngresso: number;
+  isEstudante: boolean;
 }
 
 export class PagamentoSessaoDto {
@@ -24,21 +24,17 @@ export class PagamentoSessaoDto {
   @IsNotEmpty()
   cpfCliente: string;
 
-  
-
   constructor(
     idSessao: number,
     idSala: number,
     idFilme: number,
     ingresso: Ingresso[],
     cpfCliente: string,
-    
   ) {
     this.idSessao = idSessao;
     this.idSala = idSala;
     this.idFilme = idFilme;
     this.ingresso = ingresso;
     this.cpfCliente = cpfCliente;
-    
   }
 }

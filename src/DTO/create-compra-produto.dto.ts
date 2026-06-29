@@ -1,11 +1,9 @@
-
 export class CreateCompraProdutoDto {
-    idProdutos: number[]
-    
-    cpf: string
+  idProdutos: number[];
 
-    constructor(idProdutos: number[], cpf: string) {
-        this.idProdutos = idProdutos,
-        this.cpf = cpf
-    }
+  cpf: string;
+
+  constructor(idProdutos: number[], cpf: string) {
+    ((this.idProdutos = idProdutos), (this.cpf = cpf));
+  }
 }
