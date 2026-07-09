@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateSalaDto } from '../DTO/create-sala.dto';
 import { SalasRepository } from '../repository/salas.repository';
 import { Tiers } from '../enum/tiers.enum';
@@ -9,7 +8,6 @@ import { ConflictException } from '@nestjs/common/exceptions/conflict.exception'
 @Injectable()
 export class SalasService {
   constructor(
-    private prisma: PrismaService,
     private salasRepository: SalasRepository,
   ) {}
 

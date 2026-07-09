@@ -8,8 +8,6 @@ import { Tiers } from '../enum/tiers.enum';
 @Injectable()
 export class IngressoService {
   constructor(
-    private sessaoRepository: SessaoRepository,
-    private salaRepository: SalasRepository,
     private ingressosRepository: IngressosRepository,
   ) {}
 

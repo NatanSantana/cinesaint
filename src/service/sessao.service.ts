@@ -294,7 +294,7 @@ export class SessaoService {
       );
     }
   
-
+    // marcas ingressos como utilizados
     await this.pagamentoSessaoRepository.utilizarIngresso(cpf);
 
     return ingressosComprados;
