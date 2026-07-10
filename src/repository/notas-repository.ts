@@ -13,5 +13,16 @@ export class NotasRepository {
         })
     }
 
+    excluirNota(idFilme: number, idUsuario: number) {
+        return this.prisma.notasFilme.deleteMany({
+            where: {
+                AND: [
+                    {idFilme: idFilme},
+                    {idUsuario: idUsuario}
+                ]
+            }
+        })
+    }
+
 
 }

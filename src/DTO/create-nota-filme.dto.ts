@@ -8,6 +8,7 @@ export class CreateNotaFilmeDto {
     @IsNumber({ maxDecimalPlaces: 1 })
     nota: number
 
+    @IsNumber()
     idUsuario: number
 
     constructor(idFilme: number, nota: number, idUsuario: number) {

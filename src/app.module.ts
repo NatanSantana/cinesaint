@@ -27,6 +27,10 @@ import { ProdutosService } from './service/produtos.service';
 import { ProdutosRepository } from './repository/produtos.repository';
 import { ProdutosController } from './controller/produto.controller';
 import { PaymentRefund } from 'mercadopago';
+import { ComentariosRepository } from './repository/comentarios.repository';
+import { ComentariosService } from './service/comentarios.service';
+import { NotasRepository } from './repository/notas-repository';
+import { NotasService } from './service/notas.service';
 
 @Module({
   imports: [
@@ -63,6 +67,10 @@ import { PaymentRefund } from 'mercadopago';
     ProdutosService,
     ProdutosRepository,
     PaymentRefund,
+    ComentariosRepository,
+    ComentariosService,
+    NotasRepository,
+    NotasService
   ],
 })
 export class AppModule {}
