@@ -51,7 +51,7 @@ model notasFilme {
     idUsuario   Int
     users       Users     @relation(fields: [idUsuario], references: [idUser])
 
-    nota        Int
+    nota        Decimal @db.Decimal(3, 1)
 
 
     @@map("notasFilme")

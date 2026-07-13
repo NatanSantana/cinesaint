@@ -6,6 +6,31 @@ import { PrismaService } from "../prisma/prisma.service";
 export class ComentariosRepository {
     constructor(private prisma: PrismaService) {}
 
+    listarComentariosByIdFilme(idFilme: number) {
+        return this.prisma.comentariosFilme.findMany({
+            where: {
+                idFilme: idFilme
+            }
+        })
+    }
+    
+    listarComentariosByIdUser(idUser: number) {
+        return this.prisma.comentariosFilme.findMany({
+            where: {
+                idUsuario: idUser
+            }
+        })
+    }
+
+    listarComentariosByUserFilme(idUser: number, idFilme: number) {
+        return this.prisma.comentariosFilme.findMany({
+            where: {
+                idFilme: idFilme,
+                idUsuario: idUser
+            }
+        })
+    }
+
     registrarComentario(dto: CreateComentariosFilmes) {
         return this.prisma.comentariosFilme.create({
             data: dto

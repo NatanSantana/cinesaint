@@ -6,6 +6,14 @@ import { CreateNotaFilmeDto } from "../DTO/create-nota-filme.dto";
 export class NotasRepository {
     constructor(private prisma: PrismaService) {}
 
+    findByIdFilme(idFilme: number) {
+        return this.prisma.notasFilme.findMany({
+            where: {
+                idFilme: idFilme
+            }
+        })
+    }
+
 
     lancarNota(notaDto: CreateNotaFilmeDto) {
         return this.prisma.notasFilme.create({

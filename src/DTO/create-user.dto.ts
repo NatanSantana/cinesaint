@@ -1,5 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, IsDate } from 'class-validator';
 import { Roles } from '../enum/role.enum';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -21,6 +22,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsDate()
+  @Type(() => Date)
   dataNascimento: Date;
 
   @IsNotEmpty()

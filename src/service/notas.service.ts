@@ -13,6 +13,22 @@ export class NotasService {
                 private filmesRepository: FilmeRepository
     ) {}
 
+    async mediaNotaByIdFilme(idFilme: number) {
+        const filmeEncontrado = await this.notasRepository.findByIdFilme(idFilme);
+        if (!filmeEncontrado) 
+            throw new NotFoundException("O filme não foi encontrado")
+
+        let somaTotal = 0;
+        filmeEncontrado.forEach((i) => somaTotal += Number(i.nota))
+
+        const media = somaTotal / filmeEncontrado.length
+
+        return media;
+
+    }
+
+    
+
     async adicionarNotaFilme(notaDto: CreateNotaFilmeDto) {
 
         const user = await this.usersRepository.findById(notaDto.idUsuario);
@@ -30,8 +46,11 @@ export class NotasService {
             throw new BadRequestException('A nota deve seguir este padrão: (Ex: 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)');
         }
 
-        if (await this.notasRepository.isNotaAdicionada(notaDto.idFilme, notaDto.idUsuario)) throw new ConflictException("O usuário já adicionou uma nota para esse filme")
+        if (await this.notasRepository.isNotaAdicionada(notaDto.idFilme, notaDto.idUsuario)) 
+            throw new ConflictException("O usuário já adicionou uma nota para esse filme")
 
+
+        
         return await this.notasRepository.lancarNota(notaDto);
     }
 
