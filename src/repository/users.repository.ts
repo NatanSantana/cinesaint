@@ -17,6 +17,17 @@ export class UsersRepository {
     });
   }
 
+  async findById(id: number) {
+    return await this.prisma.users.findUnique({
+      select: {
+        idUser: true
+      },
+      where: {
+        idUser: id
+      }
+    })
+  }
+
   async findByEmail(email: string) {
     return await this.prisma.users.findUnique({
       where: {

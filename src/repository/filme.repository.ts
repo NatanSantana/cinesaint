@@ -12,6 +12,17 @@ export class FilmeRepository {
     });
   }
 
+  async findById(id: number) {
+    return await this.prisma.filme.findUnique({
+      select: {
+        idFilme: true
+      },
+      where: {
+        idFilme: id
+      }
+    })
+  }
+
   async searchByNome(nome: string) {
     return await this.prisma.filme.findUnique({ where: { nome } });
   }

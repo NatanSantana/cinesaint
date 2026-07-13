@@ -27,6 +27,12 @@ import { ProdutosService } from './service/produtos.service';
 import { ProdutosRepository } from './repository/produtos.repository';
 import { ProdutosController } from './controller/produto.controller';
 import { PaymentRefund } from 'mercadopago';
+import { ComentariosRepository } from './repository/comentarios.repository';
+import { ComentariosService } from './service/comentarios.service';
+import { NotasRepository } from './repository/notas-repository';
+import { NotasService } from './service/notas.service';
+import { ComentariosController } from './controller/comentarios.controller';
+import { NotasController } from './controller/notas.controller';
 
 @Module({
   imports: [
@@ -42,6 +48,8 @@ import { PaymentRefund } from 'mercadopago';
     AssentosController,
     MercadoPagoController,
     ProdutosController,
+    NotasController,
+    ComentariosController
   ],
 
   providers: [
@@ -63,6 +71,12 @@ import { PaymentRefund } from 'mercadopago';
     ProdutosService,
     ProdutosRepository,
     PaymentRefund,
+    ComentariosRepository,
+    ComentariosService,
+    NotasRepository,
+    NotasService,
+    ComentariosRepository,
+    ComentariosService
   ],
 })
 export class AppModule {}

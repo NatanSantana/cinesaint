@@ -42,6 +42,35 @@ enum StatusCadeira {
 }
 
 
+model notasFilme {
+    id          Int       @id @default(autoincrement())
+
+    idFilme     Int
+    filme       Filme     @relation(fields: [idFilme], references: [idFilme])
+
+    idUsuario   Int
+    users       Users     @relation(fields: [idUsuario], references: [idUser])
+
+    nota        Int
+
+
+    @@map("notasFilme")
+}
+
+model comentariosFilme {
+    id           Int      @id @default(autoincrement())
+
+    idFilme     Int
+    filme       Filme     @relation(fields: [idFilme], references: [idFilme])
+
+    idUsuario   Int
+    users       Users     @relation(fields: [idUsuario], references: [idUser])
+
+    comentario  String
+
+    @@map("comentariosFilme")
+}
+
 model Produtos {
   idProduto   Int       @id @default(autoincrement())
   nome        String    @unique
@@ -176,6 +205,10 @@ model Filme {
 
   sessoes Sessao[]
 
+  notasFilme notasFilme[]
+
+  comentariosFilme  comentariosFilme[]
+
   ingressosComprados IngressosComprados[]
 
   @@map("filmes")
@@ -193,6 +226,12 @@ model Users {
     cpf             String  @unique
     dataNascimento  DateTime
     role            Roles   @default(USER)
+
+    comentariosFilme  comentariosFilme[]
+
+    notasFilme        notasFilme[]
+
+    @@map("users")
   }
 
 model ResetPassword {
