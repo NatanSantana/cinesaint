@@ -24,5 +24,17 @@ export class NotasRepository {
         })
     }
 
+    isNotaAdicionada(idFilme: number, idUsuario: number) {
+        return this.prisma.notasFilme.findFirst({
+            select: {
+                id: true
+            },
+            where: {
+                idUsuario: idUsuario,
+                idFilme: idFilme
+            }
+        })
+    }
+
 
 }

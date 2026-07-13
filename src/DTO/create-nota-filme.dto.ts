@@ -1,6 +1,8 @@
-import { IsNumber, Max, Min } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, Max, Min } from "class-validator";
 
 export class CreateNotaFilmeDto {
+    @IsNumber()
+    @IsNotEmpty()
     idFilme: number
 
     @Max(5, { message: 'A nota máxima é 5' })

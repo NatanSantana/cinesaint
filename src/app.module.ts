@@ -31,6 +31,8 @@ import { ComentariosRepository } from './repository/comentarios.repository';
 import { ComentariosService } from './service/comentarios.service';
 import { NotasRepository } from './repository/notas-repository';
 import { NotasService } from './service/notas.service';
+import { ComentariosController } from './controller/comentarios.controller';
+import { NotasController } from './controller/notas.controller';
 
 @Module({
   imports: [
@@ -46,6 +48,8 @@ import { NotasService } from './service/notas.service';
     AssentosController,
     MercadoPagoController,
     ProdutosController,
+    NotasController,
+    ComentariosController
   ],
 
   providers: [
@@ -70,7 +74,9 @@ import { NotasService } from './service/notas.service';
     ComentariosRepository,
     ComentariosService,
     NotasRepository,
-    NotasService
+    NotasService,
+    ComentariosRepository,
+    ComentariosService
   ],
 })
 export class AppModule {}

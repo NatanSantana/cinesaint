@@ -63,7 +63,9 @@ export class MercadoPagoController {
           result.status,
         );
       console.log(body);
+
     } catch (error) {
+      
       console.warn('O registro da compra falhou, PROCESSANDO REEMBOLSO...');
       if (result.transaction_amount === undefined) {
         throw new InternalServerErrorException(
