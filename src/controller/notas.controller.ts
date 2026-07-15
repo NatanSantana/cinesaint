@@ -24,5 +24,10 @@ export class NotasController {
         return await this.notasService.mediaNotaByIdFilme(idFilme);
     }
 
+    @Get("/allByIdFilme")
+    async listarByIdFilme(@Query("idFilme") idFilme: number) {
+        return await this.notasService.listarNotaByIdFilme(idFilme);
+    }
+
 
 }

@@ -13,6 +13,11 @@ export class NotasService {
                 private filmesRepository: FilmeRepository
     ) {}
 
+    async listarNotaByIdFilme(idFilme: number) {
+        const nota = this.notasRepository.findByIdFilme(idFilme);
+        return nota;
+    }
+
     async mediaNotaByIdFilme(idFilme: number) {
         const filmeEncontrado = await this.notasRepository.findByIdFilme(idFilme);
         if (!filmeEncontrado) 
