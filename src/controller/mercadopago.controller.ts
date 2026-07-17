@@ -28,6 +28,7 @@ export class MercadoPagoController {
     @Headers('x-request-id') requestId: string,
     @Query('data.id') dataId: string,
   ) {
+
     const secret = process.env.SIGNATURE || 'token';
 
     try {
@@ -46,7 +47,7 @@ export class MercadoPagoController {
 
     const payment = new Payment(client);
     const result = await payment.get({ id: body.data.id });
-    const refundClient = new PaymentRefund(client);
+    
 
     try {
       if (result.metadata.tipo_compra === 'snacks') {
@@ -66,7 +67,9 @@ export class MercadoPagoController {
 
     } catch (error) {
       
+      const refundClient = new PaymentRefund(client);
       console.warn('O registro da compra falhou, PROCESSANDO REEMBOLSO...');
+
       if (result.transaction_amount === undefined) {
         throw new InternalServerErrorException(
           'Valor da transação não encontrado para reembolso',

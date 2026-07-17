@@ -1,12 +1,16 @@
-import { Controller, Post, Get, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
 import { ProdutosService } from '../service/produtos.service';
 import { CreateProdutoDto } from '../DTO/create-produto.dto';
 import { CreateCompraProdutoDto } from '../DTO/create-compra-produto.dto';
+import { Roles } from '../decorator/roles.decorator';
+import { JwtAuthGuard } from '../security/jwt-auth.guard';
 
 @Controller('/produto')
 export class ProdutosController {
   constructor(private produtoService: ProdutosService) {}
 
+  @UseGuards(JwtAuthGuard)
+  @Roles('ADM')
   @Post('/registrar')
   async registrarProduto(@Body() produto: CreateProdutoDto) {
     return await this.produtoService.registrarProduto(produto);
@@ -17,6 +21,7 @@ export class ProdutosController {
     return await this.produtoService.listarProdutos();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/compra')
   async comprarProduto(@Body() checkout: CreateCompraProdutoDto) {
     return await this.produtoService.comprar(checkout);
