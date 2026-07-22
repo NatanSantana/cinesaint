@@ -33,6 +33,7 @@ import { NotasRepository } from './repository/notas-repository';
 import { NotasService } from './service/notas.service';
 import { ComentariosController } from './controller/comentarios.controller';
 import { NotasController } from './controller/notas.controller';
+import { RedisModule } from './module/redis.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { NotasController } from './controller/notas.controller';
     UsersModule,
     AuthModule,
     SessaoModule,
+    RedisModule
   ],
   controllers: [
     AppController,

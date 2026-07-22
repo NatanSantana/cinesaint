@@ -148,8 +148,7 @@ export class SessaoService {
       } else {
         // Se o segundo ingresso for um estudante, vai somar pela metade do valor do ingresso,
         // se não for, vai somar pelo preço integral
-        precoTotal +=
-          i.isEstudante === true ? precoIngresso / 2 : precoIngresso;
+        precoTotal += i.isEstudante === true ? precoIngresso / 2 : precoIngresso;
       }
     }
 
